@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الإحصائيات المباشرة - نظام التوصيات الذكية</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --info: #3498db;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Cairo', 'Segoe UI', sans-serif;
+            padding: 15px;
+        }
+        
+        .main-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        
+        .header-section {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+        
+        /* تصميم الجدول مشابه للصورة تماماً */
+        .market-table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+        
+        .market-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            min-width: 1000px;
+        }
+        
+        .market-table thead {
+            background: linear-gradient(90deg, #2c3e50, #34495e);
+        }
+        
+        .market-table th {
+            color: white;
+            padding: 18px 15px;
+            font-weight: 700;
+            text-align: center;
+            border: none;
+            font-size: 16px;
+            white-space: nowrap;
+        }
+        
+        .market-table th:first-child {
+            border-top-right-radius: 10px;
+        }
+        
+        .market-table th:last-child {
+            border-top-left-radius: 10px;
+        }
+        
+        .market-table td {
+            padding: 16px 15px;
+            text-align: center;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 15px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        .market-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .market-table tbody tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+        
+        /* ألوان الأرقام */
+        .change-positive {
+            color: var(--success);
+            font-weight: 700;
+        }
+        
+        .change-positive::before {
+            content: "+";
+        }
+        
+        .change-negative {
+            color: var(--danger);
+            font-weight: 700;
+        }
+        
+        .trend-icon {
+            font-size: 16px;
+            margin-left: 5px;
+        }
+        
+        /* تنسيق الأعمدة */
+        .col-symbol {
+            font-weight: 700;
+            color: #2c3e50;
+            background: #f8f9fa;
+            border-right: 2px solid #eee;
+        }
+        
+        .col-last {
+            font-weight: 700;
+            font-size: 16px;
+            color: #2c3e50;
+        }
+        
+        /* أزرار التنقل */
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            padding: 12px 25px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            border: 2px solid;
+        }
+        
+        .nav-btn-primary {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .nav-btn-outline {
+            background: white;
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        /* معلومات التحديث */
+        .update-info {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 30px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+        }
+        
+        .update-time {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            text-align: center;
+            border-top: 4px solid;
+        }
+        
+        .summary-card-tasi {
+            border-top-color: var(--primary);
+        }
+        
+        .summary-card-change {
+            border-top-color: var(--info);
+        }
+        
+        .summary-card-trades {
+            border-top-color: var(--warning);
+        }
+        
+        .summary-card-stocks {
+            border-top-color: var(--success);
+        }
+        
+        .summary-value {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        
+        .summary-label {
+            color: #666;
+            font-size: 15px;
+            font-weight: 600;
+        }
+        
+        .change-indicator {
+            font-size: 14px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        
+        .change-up {
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--success);
+        }
+        
+        .change-down {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--danger);
+        }
+        
+        /* تحسينات للهواتف */
+        @media (max-width: 768px) {
+            .market-table {
+                font-size: 13px;
+            }
+            
+            .market-table th,
+            .market-table td {
+                padding: 12px 8px;
+            }
+            
+            .nav-btn {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* فلتر الجدول */
+        .table-filter {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .filter-btn {
+            padding: 8px 20px;
+            border-radius: 25px;
+            background: white;
+            border: 2px solid #ddd;
+            color: #666;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="main-container">
+            <!-- شريط التنقل العلوي -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold mb-0 text-primary">
+                    <i class="fas fa-chart-bar me-2"></i>الإحصائيات المباشرة
+                </h2>
+                <div class="d-flex gap-2">
+                    <a href="/market" class="nav-btn nav-btn-outline">
+                        <i class="fas fa-arrow-right me-2"></i>عودة للتوصيات
+                    </a>
+                    <a href="/statistics" class="nav-btn nav-btn-primary">
+                        <i class="fas fa-chart-line me-2"></i>الإحصائيات
+                    </a>
+                </div>
+            </div>
+            
+            <!-- العنوان -->
+            <div class="header-section text-center">
+                <h1 class="h3 fw-bold mb-3">
+                    <i class="fas fa-chart-bar me-2"></i>الإحصائيات المباشرة للسوق السعودي
+                </h1>
+                <p class="mb-0">بيانات حية ومباشرة من البورصة السعودية (تداول)</p>
+                
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-light text-dark fs-6">
+                            <i class="fas fa-user me-2"></i>{{ username }}
+                        </span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-success me-3">
+                            <i class="fas fa-clock me-1"></i>{{ last_update }}
+                        </span>
+                        <a href="/logout" class="btn btn-outline-light btn-sm">
+                            <i class="fas fa-sign-out-alt me-1"></i>خروج
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ملخص المؤشرات -->
+            <div class="summary-cards">
+                <div class="summary-card summary-card-tasi">
+                    <div class="summary-value">{{ market_overview.current|round(2) }}</div>
+                    <div class="summary-label">المؤشر العام (تاسي)</div>
+                    <div class="change-indicator {% if market_overview.change >= 0 %}change-up{% else %}change-down{% endif %}">
+                        <i class="fas {% if market_overview.change >= 0 %}fa-arrow-up{% else %}fa-arrow-down{% endif %} me-1"></i>
+                        {{ market_overview.change|round(2) }} ({{ market_overview.change_percent|round(2) }}%)
+                    </div>
+                </div>
+                
+                <div class="summary-card summary-card-change">
+                    <div class="summary-value">{{ total_stocks }}</div>
+                    <div class="summary-label">إجمالي المؤشرات</div>
+                    <div class="change-indicator">
+                        <i class="fas fa-chart-line me-1"></i>
+                        بيانات حية
+                    </div>
+                </div>
+                
+                <div class="summary-card summary-card-trades">
+                    <div class="summary-value">
+                        {% set total_trades = market_stats|sum(attribute='trades') %}
+                        {{ "{:,.0f}".format(total_trades) }}
+                    </div>
+                    <div class="summary-label">إجمالي الصفقات</div>
+                </div>
+                
+                <div class="summary-card summary-card-stocks">
+                    <div class="summary-value">{{ market_stats|length }}</div>
+                    <div class="summary-label">عدد السجلات</div>
+                </div>
+            </div>
+            
+            <!-- فلتر الجدول -->
+            <div class="table-filter">
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filterTable('all')">الكل</button>
+                    <button class="filter-btn" onclick="filterTable('gainers')">الأعلى ربحاً</button>
+                    <button class="filter-btn" onclick="filterTable('losers')">الأعلى خسارة</button>
+                    <button class="filter-btn" onclick="filterTable('indices')">المؤشرات فقط</button>
+                    <button class="filter-btn" onclick="filterTable('stocks')">الأسهم فقط</button>
+                </div>
+            </div>
+            
+            <!-- الجدول الرئيسي -->
+            <div class="market-table-container">
+                <table class="market-table">
+                    <thead>
+                        <tr>
+                            <th width="8%">الرمز</th>
+                            <th width="22%">الاسم</th>
+                            <th width="12%">آخر سعر</th>
+                            <th width="12%">التغير %</th>
+                            <th width="12%">التغير</th>
+                            <th width="12%">الاتجاه</th>
+                            <th width="12%">الصفقات</th>
+                            <th width="12%">نسبة السيولة %</th>
+                        </tr>
+                    </thead>
+                    <tbody id="marketTableBody">
+                        {% for stat in market_stats %}
+                        <tr class="table-row" 
+                            data-type="{% if stat.symbol in ['TASI', 'TMTI', 'TBNI', 'TENI', 'TISI', 'THEI', 'TCGI', 'TRMI', 'TCSI', 'TFBI', 'TRLI', 'TTNI', 'TTSI', 'TFSI', 'TCPI', 'TUTI', 'TSSI', 'TMDI', 'TDFI', 'TRTI'] or 'مؤشر' in stat.name %}indices{% else %}stocks{% endif %}"
+                            data-change="{{ 'gainers' if stat.change > 0 else 'losers' }}">
+                            <td class="col-symbol">{{ stat.symbol }}</td>
+                            <td class="text-start" style="font-weight: 500;">
+                                {{ stat.name }}
+                                {% if 'مؤشر' in stat.name %}
+                                <span class="badge bg-info ms-2">مؤشر</span>
+                                {% else %}
+                                <span class="badge bg-warning ms-2">سهم</span>
+                                {% endif %}
+                            </td>
+                            <td class="col-last">{{ stat.last|round(2) }}</td>
+                            <td class="col-percent {% if stat.change_percent > 0 %}change-positive{% else %}change-negative{% endif %}">
+                                {{ stat.change_percent|round(2) }}%
+                                {% if stat.change_percent > 0 %}
+                                <i class="fas fa-arrow-up trend-icon trend-up"></i>
+                                {% else %}
+                                <i class="fas fa-arrow-down trend-icon trend-down"></i>
+                                {% endif %}
+                            </td>
+                            <td class="col-change {% if stat.change > 0 %}change-positive{% else %}change-negative{% endif %}">
+                                {{ stat.change|round(2) }}
+                            </td>
+                            <td>
+                                <span class="badge {% if stat.trend == 'صاعد' %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ stat.trend }}
+                                </span>
+                            </td>
+                            <td class="col-trades">{{ "{:,.0f}".format(stat.trades) }}</td>
+                            <!-- التصحيح هنا: استخدام get() مع قيمة افتراضية -->
+                            <td class="col-liquidity">{{ stat.get('liquidity_ratio', 50.00)|round(2) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- معلومات التحديث -->
+            <div class="update-info">
+                <div class="update-time">
+                    <i class="fas fa-sync-alt me-2"></i>
+                    آخر تحديث: {{ last_update }}
+                </div>
+                <p class="update-note mb-0">
+                    يتم تحديث البيانات تلقائياً كل 30 ثانية. للتحميل يدوياً، انقر على زر التحديث.
+                </p>
+                <button onclick="window.location.reload()" class="btn btn-primary mt-3">
+                    <i class="fas fa-sync-alt me-2"></i>تحديث البيانات
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // وظيفة تصفية الجدول
+        function filterTable(filterType) {
+            // إزالة النشاط من جميع الأزرار
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // إضافة النشاط للزر المحدد
+            event.target.classList.add('active');
+            
+            // تصفية الصفوف
+            const rows = document.querySelectorAll('.table-row');
+            let visibleCount = 0;
+            
+            rows.forEach(row => {
+                const rowType = row.getAttribute('data-type');
+                const rowChange = row.getAttribute('data-change');
+                
+                let shouldShow = false;
+                
+                switch(filterType) {
+                    case 'all':
+                        shouldShow = true;
+                        break;
+                    case 'gainers':
+                        shouldShow = (rowChange === 'gainers');
+                        break;
+                    case 'losers':
+                        shouldShow = (rowChange === 'losers');
+                        break;
+                    case 'indices':
+                        shouldShow = (rowType === 'indices');
+                        break;
+                    case 'stocks':
+                        shouldShow = (rowType === 'stocks');
+                        break;
+                }
+                
+                if (shouldShow) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            // إظهار رسالة إذا لم توجد نتائج
+            const tbody = document.getElementById('marketTableBody');
+            let noResultsRow = tbody.querySelector('.no-results-row');
+            
+            if (visibleCount === 0) {
+                if (!noResultsRow) {
+                    noResultsRow = document.createElement('tr');
+                    noResultsRow.className = 'no-results-row text-center';
+                    noResultsRow.innerHTML = `
+                        <td colspan="8" style="padding: 40px; color: #666; font-size: 18px;">
+                            <i class="fas fa-search fa-3x mb-3"></i><br>
+                            لا توجد نتائج للعرض
+                        </td>
+                    `;
+                    tbody.appendChild(noResultsRow);
+                }
+            } else if (noResultsRow) {
+                noResultsRow.remove();
+            }
+        }
+        
+        // تحديث تلقائي كل 30 ثانية
+        setInterval(() => {
+            window.location.reload();
+        }, 30000);
+        
+        // فرز الجدول حسب النسبة المئوية عند النقر على العمود
+        document.querySelectorAll('.market-table th').forEach((th, index) => {
+            th.style.cursor = 'pointer';
+            th.addEventListener('click', () => {
+                sortTable(index);
+            });
+        });
+        
+        function sortTable(columnIndex) {
+            const table = document.querySelector('.market-table');
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('.table-row'));
+            
+            rows.sort((a, b) => {
+                let aValue, bValue;
+                
+                if (columnIndex === 3) { // عمود التغير %
+                    aValue = parseFloat(a.cells[columnIndex].textContent);
+                    bValue = parseFloat(b.cells[columnIndex].textContent);
+                } else if (columnIndex === 4) { // عمود التغير
+                    aValue = parseFloat(a.cells[columnIndex].textContent);
+                    bValue = parseFloat(b.cells[columnIndex].textContent);
+                } else {
+                    return 0;
+                }
+                
+                if (isNaN(aValue) || isNaN(bValue)) {
+                    return 0;
+                }
+                
+                return Math.abs(bValue) - Math.abs(aValue);
+            });
+            
+            // إعادة ترتيب الصفوف
+            rows.forEach(row => tbody.appendChild(row));
+        }
+    </script>
+</body>
+</html>

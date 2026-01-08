@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول - سوق الأسهم</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .login-container {
+            background: white;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .login-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .login-header h2 {
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .login-header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .login-form {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e1e5ee;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #1e3c72;
+            box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(30, 60, 114, 0.3);
+        }
+        
+        .login-btn:active {
+            transform: translateY(0);
+        }
+        
+        .error-message {
+            background: #fee;
+            color: #d32f2f;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 1px solid #fcc;
+            display: {% if error %}block{% else %}none{% endif %};
+        }
+        
+        .app-info {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .app-info h3 {
+            color: #1e3c72;
+            margin-bottom: 10px;
+        }
+        
+        .credentials {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+        
+        .credentials strong {
+            color: #1e3c72;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="logo">📈 TickerChart Live</div>
+            <h2>تسجيل الدخول</h2>
+            <p>الرجاء إدخال بيانات الدخول للوصول إلى لوحة التحكم</p>
+        </div>
+        
+        <div class="login-form">
+            {% if error %}
+            <div class="error-message">
+                ⚠️ {{ error }}
+            </div>
+            {% endif %}
+            
+            <form method="POST" action="/login">
+                <div class="form-group">
+                    <label for="username">👤 اسم المستخدم</label>
+                    <input type="text" id="username" name="username" 
+                           placeholder="أدخل اسم المستخدم" required 
+                           autofocus value="turki">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">🔒 كلمة المرور</label>
+                    <input type="password" id="password" name="password" 
+                           placeholder="أدخل كلمة المرور" required 
+                           value="123456">
+                </div>
+                
+                <button type="submit" class="login-btn">
+                    🔓 تسجيل الدخول
+                </button>
+            </form>
+            
+            <div class="app-info">
+                <h3>💡 معلومات التطبيق</h3>
+                <p>تطبيق سوق الأسهم السعودي المباشر</p>
+                
+                <div class="credentials">
+                    <p><strong>بيانات الدخول الافتراضية:</strong></p>
+                    <p>👤 مرحبا بك : <strong>*</strong></p>
+                    <p>🔒  الموقع خاص لا يمكن الدخول اليه الا بسماح المالك لك : <strong>-</strong></p>
+                </div>
+                
+                <p style="margin-top: 15px; font-size: 12px; color: #888;">
+                    يتم تحديث الأسهم كل 30 ثانية ⏱️
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // إضافة تأثيرات بسيطة
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.style.transform = 'scale(1.02)';
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.parentElement.style.transform = 'scale(1)';
+                });
+            });
+            
+            // إضافة رسالة ترحيب عند التحميل
+            setTimeout(() => {
+                console.log('📊 تطبيق سوق الأسهم جاهز للتشغيل');
+            }, 1000);
+        });
+        
+        // منع إعادة إرسال النموذج عند تحديث الصفحة
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
+    </script>
+</body>
+</html>

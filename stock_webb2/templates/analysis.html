@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحليل مفصل - {{ analysis.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --info: #3498db;
+        }
+        
+        body {
+            background: #f8f9fa;
+            font-family: 'Cairo', 'Segoe UI', sans-serif;
+        }
+        
+        .analysis-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .company-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .technical-card {
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            border: none;
+        }
+        
+        .indicator-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .good { color: var(--success); }
+        .bad { color: var(--danger); }
+        .neutral { color: var(--warning); }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/market">
+                <i class="fas fa-arrow-left me-2"></i>العودة للتوصيات
+            </a>
+            <span class="text-white">
+                <i class="fas fa-user-circle me-2"></i>{{ username }}
+            </span>
+        </div>
+    </nav>
+    
+    <div class="container py-4">
+        <div class="analysis-container">
+            <!-- رأس الشركة -->
+            <div class="company-header">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="display-6 fw-bold mb-2">{{ analysis.symbol }} - {{ analysis.name }}</h1>
+                        <p class="mb-0">
+                            <i class="fas fa-industry me-2"></i>{{ analysis.sector }} | 
+                            <i class="fas fa-clock me-2"></i>{{ analysis.timeframe }}
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <span class="badge {% if analysis.recommendation == 'BUY' %}bg-success{% elif analysis.recommendation == 'SELL' %}bg-danger{% else %}bg-warning{% endif %} fs-5">
+                            {{ analysis.recommendation }}
+                        </span>
+                        <div class="mt-2">
+                            <h3 class="fw-bold mb-0">{{ analysis.current_price }} ر.س</h3>
+                            <small class="opacity-75">آخر تحديث: {{ analysis.last_update }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- معلومات التوصية -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="technical-card text-center">
+                        <h6 class="text-muted mb-3">ثقة التحليل</h6>
+                        <div class="indicator-value {{ 'good' if analysis.confidence >= 70 else 'bad' if analysis.confidence < 50 else 'neutral' }}">
+                            {{ analysis.confidence }}%
+                        </div>
+                        <div class="progress mt-2" style="height: 8px;">
+                            <div class="progress-bar" 
+                                 style="width: {{ analysis.confidence }}%; 
+                                        background: {% if analysis.confidence >= 70 %}var(--success){% elif analysis.confidence < 50 %}var(--danger){% else %}var(--warning){% endif %};">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="technical-card text-center">
+                        <h6 class="text-muted mb-3">وقف الخسارة</h6>
+                        <div class="indicator-value">
+                            {{ analysis.stop_loss }} ر.س
+                        </div>
+                        <small class="text-muted">
+                            {% set risk = analysis.current_price - analysis.stop_loss %}
+                            مخاطرة: {{ risk|round(2) }} ر.س
+                        </small>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="technical-card text-center">
+                        <h6 class="text-muted mb-3">هدف الربح</h6>
+                        <div class="indicator-value">
+                            {{ analysis.take_profit }} ر.س
+                        </div>
+                        <small class="text-muted">
+                            {% set profit = analysis.take_profit - analysis.current_price %}
+                            ربح محتمل: {{ profit|round(2) }} ر.س
+                        </small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- المؤشرات الفنية -->
+            <h4 class="fw-bold mb-4">
+                <i class="fas fa-chart-bar me-2"></i>المؤشرات الفنية
+            </h4>
+            
+            <div class="row">
+                <!-- RSI -->
+                <div class="col-md-6 mb-3">
+                    <div class="technical-card">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="fw-bold mb-0">مؤشر القوة النسبية (RSI)</h6>
+                            <span class="indicator-value {% if analysis.technical_indicators.rsi > 70 or analysis.technical_indicators.rsi < 30 %}bad{% else %}good{% endif %}">
+                                {{ analysis.technical_indicators.rsi }}
+                            </span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            {% set rsi_percent = (analysis.technical_indicators.rsi / 100) * 100 %}
+                            <div class="progress-bar bg-danger" style="width: 30%"></div>
+                            <div class="progress-bar bg-success" style="width: 40%"></div>
+                            <div class="progress-bar bg-danger" style="width: 30%"></div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-1">
+                            <small>0</small>
+                            <small>30</small>
+                            <small>70</small>
+                            <small>100</small>
+                        </div>
+                        <small class="text-muted d-block mt-2">
+                            {% if analysis.technical_indicators.rsi < 30 %}
+                            📉 في منطقة ذروة البيع (فرصة شراء)
+                            {% elif analysis.technical_indicators.rsi > 70 %}
+                            📈 في منطقة ذروة الشراء (احتياط)
+                            {% else %}
+                            📊 في المنطقة المحايدة
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+                
+                <!-- المتوسطات المتحركة -->
+                <div class="col-md-6 mb-3">
+                    <div class="technical-card">
+                        <h6 class="fw-bold mb-3">المتوسطات المتحركة</h6>
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between">
+                                <small>EMA 9 أيام:</small>
+                                <span class="fw-bold">{{ analysis.technical_indicators.ema_9 }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <small>EMA 21 يوم:</small>
+                                <span class="fw-bold">{{ analysis.technical_indicators.ema_21 }}</span>
+                            </div>
+                        </div>
+                        <small class="text-muted">
+                            {% if analysis.current_price > analysis.technical_indicators.ema_9 and analysis.technical_indicators.ema_9 > analysis.technical_indicators.ema_21 %}
+                            ✅ الاتجاه صاعد
+                            {% elif analysis.current_price < analysis.technical_indicators.ema_9 and analysis.technical_indicators.ema_9 < analysis.technical_indicators.ema_21 %}
+                            ⚠️ الاتجاه هابط
+                            {% else %}
+                            🔄 اتجاه متذبذب
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+                
+                <!-- MACD -->
+                <div class="col-md-6 mb-3">
+                    <div class="technical-card">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="fw-bold mb-0">MACD</h6>
+                            <span class="indicator-value {% if analysis.technical_indicators.macd > analysis.technical_indicators.macd_signal %}good{% else %}bad{% endif %}">
+                                {{ analysis.technical_indicators.macd|round(2) }}
+                            </span>
+                        </div>
+                        <small class="text-muted">
+                            {% if analysis.technical_indicators.macd > analysis.technical_indicators.macd_signal %}
+                            📈 إشارة شراء (MACD فوق خط الإشارة)
+                            {% else %}
+                            📉 إشارة بيع (MACD تحت خط الإشارة)
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+                
+                <!-- الحجم -->
+                <div class="col-md-6 mb-3">
+                    <div class="technical-card">
+                        <h6 class="fw-bold mb-2">تحليل الحجم</h6>
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between">
+                                <small>الحجم الحالي:</small>
+                                <span class="fw-bold">{{ "{:,}".format(analysis.technical_indicators.current_volume) }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <small>نسبة الحجم:</small>
+                                <span class="fw-bold {{ 'good' if analysis.technical_indicators.volume_ratio > 150 else 'bad' if analysis.technical_indicators.volume_ratio < 50 else 'neutral' }}">
+                                    {{ analysis.technical_indicators.volume_ratio }}%
+                                </span>
+                            </div>
+                        </div>
+                        <small class="text-muted">
+                            {% if analysis.technical_indicators.volume_ratio > 150 %}
+                            📊 حجم تداول قوي يدعم الحركة
+                            {% elif analysis.technical_indicators.volume_ratio < 50 %}
+                            ⚠️ حجم تداول ضعيف
+                            {% else %}
+                            🔄 حجم تداول طبيعي
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+                
+                <!-- ATR -->
+                <div class="col-md-6 mb-3">
+                    <div class="technical-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="fw-bold mb-0">معدل المدى الحقيقي (ATR)</h6>
+                            <span class="indicator-value">{{ analysis.technical_indicators.atr }}</span>
+                        </div>
+                        <small class="text-muted d-block mt-2">
+                            يقيس التقلب: {% if analysis.technical_indicators.atr > analysis.current_price * 0.02 %}
+                            📈 تقلب عالي
+                            {% else %}
+                            📊 تقلب طبيعي
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+                
+                <!-- ملخص التوصية -->
+                <div class="col-md-6 mb-3">
+                    <div class="technical-card">
+                        <h6 class="fw-bold mb-3">ملخص التوصية</h6>
+                        <div class="alert {% if analysis.recommendation == 'BUY' %}alert-success{% elif analysis.recommendation == 'SELL' %}alert-danger{% else %}alert-warning{% endif %}">
+                            <h6 class="fw-bold">
+                                {% if analysis.recommendation == 'BUY' %}
+                                🟢 توصية شراء
+                                {% elif analysis.recommendation == 'SELL' %}
+                                🔴 توصية بيع
+                                {% else %}
+                                🟡 محايد (انتظار)
+                                {% endif %}
+                            </h6>
+                            <p class="mb-2">نسبة الثقة: <strong>{{ analysis.confidence }}%</strong></p>
+                            <p class="mb-0">التوقيت: <strong>{{ analysis.timeframe }}</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- أسباب التوصية -->
+            {% if analysis.reasons %}
+            <div class="technical-card mt-3">
+                <h5 class="fw-bold mb-3">
+                    <i class="fas fa-list-check me-2"></i>أسباب التوصية
+                </h5>
+                <ul class="list-group list-group-flush">
+                    {% for reason in analysis.reasons %}
+                    <li class="list-group-item d-flex align-items-center">
+                        <i class="fas fa-check-circle me-3 text-success"></i>
+                        {{ reason }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            
+            <!-- ملاحظات -->
+            <div class="alert alert-info mt-4">
+                <h6 class="fw-bold">
+                    <i class="fas fa-lightbulb me-2"></i>ملاحظات هامة
+                </h6>
+                <ul class="mb-0">
+                    <li>هذه التوصيات تعتمد على التحليل الفني ولا تضمن الربح</li>
+                    <li>يجب استخدام وقف الخسارة دائماً</li>
+                    <li>التوصية صالحة للإطار الزمني المحدد فقط</li>
+                    <li>تاريخ التحليل: {{ analysis.analysis_time }}</li>
+                </ul>
+            </div>
+            
+            <!-- الأزرار -->
+            <div class="d-flex justify-content-between mt-4">
+                <a href="/market" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-right me-2"></i>العودة للتوصيات
+                </a>
+                <div>
+                    <button onclick="window.print()" class="btn btn-outline-secondary me-2">
+                        <i class="fas fa-print me-2"></i>طباعة

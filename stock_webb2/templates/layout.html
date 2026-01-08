@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}محرك توصيات الأسهم السعودية{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --primary-color: #0066cc;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        .navbar {
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .stock-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+            margin-bottom: 1rem;
+        }
+        
+        .stock-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,.1);
+        }
+        
+        .trend-up {
+            color: #28a745;
+        }
+        
+        .trend-down {
+            color: #dc3545;
+        }
+        
+        .trend-stable {
+            color: #6c757d;
+        }
+        
+        .market-status {
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        
+        .performance-bar {
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+        
+        .search-box {
+            max-width: 400px;
+        }
+        
+        .data-source-badge {
+            font-size: 0.7rem;
+            vertical-align: middle;
+        }
+        
+        .analysis-section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        }
+        
+        .portfolio-summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .market-stats .col {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- شريط التنقل -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('market') }}">
+                <i class="bi bi-graph-up"></i> توصيات الأسهم السعودية
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'market' %}active{% endif %}" 
+                           href="{{ url_for('market') }}">
+                            <i class="bi bi-house-door"></i> الرئيسية
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'portfolio' %}active{% endif %}" 
+                           href="{{ url_for('portfolio') }}">
+                            <i class="bi bi-wallet2"></i> محفظتي
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="d-flex align-items-center">
+                    {% if session.username %}
+                        <span class="text-light me-3">
+                            <i class="bi bi-person-circle"></i> {{ session.username }}
+                        </span>
+                        <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">
+                            <i class="bi bi-box-arrow-right"></i> خروج
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- محتوى الصفحة -->
+    <main class="container mt-4">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- الفوتر -->
+    <footer class="bg-dark text-white mt-5 py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="bi bi-info-circle"></i> معلومات</h5>
+                    <p class="small">
+                        هذا الموقع يقدم توصيات استثمارية بناءً على تحليل الأسهم السعودية.
+                        البيانات قد تكون واقعية أو محاكاة لأغراض تعليمية.
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <h5><i class="bi bi-exclamation-triangle"></i> تنبيه</h5>
+                    <p class="small">
+                        التوصيات المقدمة هي لأغراض تعليمية فقط ولا تشكل نصيحة استثمارية.
+                        الاستثمار في الأسهم يحمل مخاطر، راجع مستشارك المالي قبل اتخاذ أي قرار.
+                    </p>
+                </div>
+            </div>
+            <hr class="bg-light">
+            <p class="text-center small mb-0">
+                &copy; 2024 محرك توصيات الأسهم السعودية - جميع الحقوق محفوظة
+            </p>
+        </div>
+    </footer>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
